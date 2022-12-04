@@ -14,9 +14,6 @@ main = do
 toInt :: String -> Int
 toInt = read
 
-dropPredicate :: String -> Bool
-dropPredicate x = x == ""
-
 breakEmpty :: [String] -> [[String]]
 breakEmpty x = splitOn [""] x
 
