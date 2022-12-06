@@ -6,31 +6,40 @@ main = do
         contents <- readFile "input_day05.txt"
 
         let piles = toPiles $ reverse $ take 8 $ lines $ contents
-        let instructions = map ((map toInt) . (filter notFromOrTo) . (splitOn " ") . (drop 5)) $ drop 10 $ lines $ contents
+        let instructions = map toMove $ map ((map toInt) . (filter notFromOrTo) . (splitOn " ") . (drop 5)) $ drop 10 $ lines $ contents
         -- part 1 --
         print $ solvePuzzle moveOneByOne piles instructions
         -- part 2 --
         print $ solvePuzzle moveAllAtOnce piles instructions
 
-solvePuzzle :: ([String] -> [Int] -> [String]) -> [String] -> [[Int]] -> String
+data Move = Move    {
+                    i :: Int,
+                    from :: Int,
+                    to :: Int 
+                    }
+
+toMove :: [Int] -> Move 
+toMove x = Move (x !! 0) (x !! 1) ( x !! 2) 
+
+solvePuzzle :: ([String] -> Move -> [String]) -> [String] -> [Move] -> String
 solvePuzzle strategy piles ins = map last $ foldl strategy piles $ ins
 
-moveOneByOne :: [String] -> [Int] -> [String]
-moveOneByOne p i = foldl (moveOne (i !! 1) (i !! 2)) p [1..(i !! 0)] 
+moveOneByOne :: [String] -> Move -> [String]
+moveOneByOne p mv = foldl (moveOne mv) p [1..(i mv)] 
 
-moveOne :: Int -> Int -> [String] -> Int -> [String]
-moveOne from to p _ = map (moveMap (from-1) (to-1) p 1) [0..((length p) - 1)]
+moveOne :: Move -> [String] -> Int -> [String]
+moveOne mv p _ = map (moveMap (from mv-1) (to mv-1) p 1) [0..((length p) - 1)]
 
 moveMap :: Int -> Int -> [String] -> Int -> Int -> String
 moveMap from to p count i | from == i = dropEnd count (p !! i)
                     | to == i = (p !! i) ++ (takeEnd count (p !! from))
                     | otherwise = (p !! i)
 
-moveAllAtOnce :: [String] -> [Int] -> [String]
-moveAllAtOnce p i = moveAll (i !! 1) (i !! 2) p (i !! 0)
+moveAllAtOnce :: [String] -> Move -> [String]
+moveAllAtOnce p mv = moveAll mv p
 
-moveAll :: Int -> Int -> [String] -> Int -> [String]
-moveAll from to p count = map (moveMap  (from-1) (to-1) p count) [0..((length p) - 1)]
+moveAll :: Move -> [String] -> [String]
+moveAll mv p = map (moveMap  (from mv -1) (to mv -1) p (i mv)) [0..((length p) - 1)]
 
 toPiles :: [[Char]] -> [[Char]]
 toPiles x = map (toPile $ filterAll x) [0..8]
