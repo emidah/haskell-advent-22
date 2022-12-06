@@ -12,13 +12,8 @@ main = do
         -- part 2 --
         print $ solvePuzzle moveAllAtOnce piles instructions
 
-solvePuzzle strategy piles ins = map last $ filter isNotEmpty $ doMoves strategy piles $ ins
-
-isNotEmpty :: String -> Bool
-isNotEmpty s = s /= ""
-
-doMoves :: ([String] -> [Int] -> [String]) -> [String] -> [[Int]] -> [String]
-doMoves m p i = foldl m p i
+solvePuzzle :: ([String] -> [Int] -> [String]) -> [String] -> [[Int]] -> String
+solvePuzzle strategy piles ins = map last $ foldl strategy piles $ ins
 
 moveOneByOne :: [String] -> [Int] -> [String]
 moveOneByOne p i = foldl (moveOne (i !! 1) (i !! 2)) p [1..(i !! 0)] 
